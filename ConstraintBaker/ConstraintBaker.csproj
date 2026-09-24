@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<RootNamespace>ConstraintBaker</RootNamespace>
+		<LangVersion>latest</LangVersion>
+		<IsPackable>false</IsPackable>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<NeutralLanguage>en-US</NeutralLanguage>
+		<AssemblyName>ConstraintBaker</AssemblyName>
+		<Platforms>AnyCPU;x64</Platforms>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="Core.cs" />
+		<Compile Include="Baker.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Il2CppInterop.Common">
+			<HintPath>..\..\gogh Focus with Your Avatar\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Il2Cppmscorlib">
+			<HintPath>..\..\gogh Focus with Your Avatar\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="MelonLoader">
+			<HintPath>..\..\gogh Focus with Your Avatar\MelonLoader\net6\MelonLoader.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Il2CppInterop.Runtime">
+			<HintPath>..\..\gogh Focus with Your Avatar\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<!-- Unity 类型必须用 Il2CppAssemblies 里的 interop 版：那里 Component 才继承
+		     Il2CppObjectBase，才有 Pointer / TryCast。UnityDependencies 下的是 stub。 -->
+		<Reference Include="UnityEngine">
+			<HintPath>..\..\gogh Focus with Your Avatar\MelonLoader\Il2CppAssemblies\UnityEngine.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>..\..\gogh Focus with Your Avatar\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="UnityEngine.AnimationModule">
+			<HintPath>..\..\gogh Focus with Your Avatar\MelonLoader\Il2CppAssemblies\UnityEngine.AnimationModule.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="UnityEngine.InputLegacyModule">
+			<HintPath>..\..\gogh Focus with Your Avatar\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+	</ItemGroup>
+</Project>
