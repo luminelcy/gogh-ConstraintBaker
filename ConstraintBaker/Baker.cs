@@ -41,7 +41,9 @@ namespace ConstraintBaker
         private static int _lastLoggedKept = -1;
 
         private static readonly Dictionary<IntPtr, Snapshot> _baked = new();
-        private static readonly HashSet<IntPtr> _keepLive = new();
+        // 值存包装只为判活（fake-null 区分"销毁后指针复用"），键仍用 IntPtr：
+        // IL2CPP 包装实例跨调用身份不保证稳定，不能拿对象当键
+        private static readonly Dictionary<IntPtr, ParentConstraint> _keepLive = new();
 
         /// <summary>烘焙时的源相对位姿快照：约束节点父级空间下的 source 位置/旋转。</summary>
         private sealed class Snapshot
@@ -174,6 +176,12 @@ namespace ConstraintBaker
             foreach (var p in stale) _baked.Remove(p);
             stale.Clear();
 
+            // 保留集同理：不判活的话，销毁后指针被新约束复用会误标"保留"，白丢一块收益
+            foreach (var kv in _keepLive)
+                if (kv.Value == null) stale.Add(kv.Key);
+            foreach (var p in stale) _keepLive.Remove(p);
+            stale.Clear();
+
             for (int i = 0; i < pcs.Length; i++)
             {
                 var pc = pcs[i];
@@ -187,13 +195,13 @@ namespace ConstraintBaker
                     _baked.Remove(ptr);
                 }
 
-                if (_keepLive.Contains(ptr)) { kept++; continue; }
+                if (_keepLive.ContainsKey(ptr)) { kept++; continue; }
                 if (!pc.enabled) continue;             // 别人关的，不插手
 
-                if (ShouldKeepLive(pc, moverCache)) { _keepLive.Add(ptr); kept++; continue; }
+                if (ShouldKeepLive(pc, moverCache)) { _keepLive[ptr] = pc; kept++; continue; }
 
                 var snap = Snapshot.Of(pc);
-                if (snap == null) { _keepLive.Add(ptr); kept++; continue; }  // 结构异常，保守保留
+                if (snap == null) { _keepLive[ptr] = pc; kept++; continue; }  // 结构异常，保守保留
                 _baked[ptr] = snap;
                 pc.enabled = false;
                 baked++;
@@ -203,7 +211,8 @@ namespace ConstraintBaker
             {
                 _lastLoggedBaked = baked;
                 _lastLoggedKept = kept;
-                MelonLogger.Msg($"[ConstraintBaker] 烘焙 {baked} / 保留 {kept}");
+                // 正常运行不刷日志，要诊断时临时放开
+                // MelonLogger.Msg($"[ConstraintBaker] 烘焙 {baked} / 保留 {kept}");
             }
         }
 
@@ -227,7 +236,7 @@ namespace ConstraintBaker
                 if (!s.Drifted()) continue;
 
                 s.Pc.enabled = true;
-                _keepLive.Add(kv.Key);
+                _keepLive[kv.Key] = s.Pc;
                 stale.Add(kv.Key);
                 recovered++;
                 MelonLogger.Warning($"[ConstraintBaker] 挂点在动，恢复约束: {s.Pc.transform.name}");

@@ -25,7 +25,8 @@ namespace ConstraintBaker
 
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("[ConstraintBaker] 已加载：自动烘焙静态源 ParentConstraint，F8 = 总开关");
+            // 正常运行不刷日志，要诊断时临时放开
+            // MelonLogger.Msg("[ConstraintBaker] 已加载：自动烘焙静态源 ParentConstraint，F8 = 总开关");
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
